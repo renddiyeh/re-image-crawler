@@ -1,17 +1,12 @@
-"""
-Flask Documentation:     http://flask.pocoo.org/docs/
-Jinja2 Documentation:    http://jinja.pocoo.org/2/documentation/
-Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
-
-This file creates your application.
-"""
-
 import os
 from flask import Flask, request, redirect, url_for, jsonify
+import haul
+import validators
+from urllib import unquote
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'this_should_be_configured')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'p7HzB2UBZCxp8B1XGYV10h6eRqOirD8h')
 
 
 ###
@@ -20,8 +15,14 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'this_should_be_configur
 
 @app.route('/')
 def home():
-    """Render website's home page."""
-    return jsonify(msg="welcome")
+    url = unquote(request.args.get('url'))
+    if url is None:
+        return jsonify(error=406, text="No url given."), 406
+    if not validators.url(url):
+        return jsonify(error=406, text="Invalid url."), 406
+
+    result = haul.find_images(url)
+    return jsonify(result.__dict__)
 
 @app.after_request
 def add_header(response):
@@ -32,12 +33,10 @@ def add_header(response):
     response.headers['Content-Type'] = 'application/json'
     return response
 
-
 @app.errorhandler(404)
 def page_not_found(e):
     """Custom 404 page."""
     return jsonify(error=404, text=str(e)), 404
-
 
 if __name__ == '__main__':
     app.run(debug=True)
