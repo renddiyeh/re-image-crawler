@@ -64,6 +64,8 @@ def add_header(response):
     and also to cache the rendered page for 10 minutes.
     """
     response.headers['Content-Type'] = 'application/json'
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Headers'] = 'X-CSRF-TOKEN'
     return response
 
 @app.errorhandler(404)
