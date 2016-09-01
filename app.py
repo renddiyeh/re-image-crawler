@@ -13,7 +13,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'p7HzB2UBZCxp8B1XGYV10h6
 ###
 # Routing for your application.
 ###
-def video_id(url):
+def getYoutubeId(url):
     """
     Examples:
     - http://youtu.be/SA2iWivDJiE
@@ -36,15 +36,18 @@ def video_id(url):
     return None
 
 def youtubeImg(url):
-    youtubeID = video_id(url)
+    youtubeID = getYoutubeId(url)
     if youtubeID:
-        return "https://i.ytimg.com/vi/"+youtubeID+"/default.jpg"
+        return "https://i.ytimg.com/vi/"+youtubeID+"/hqdefault.jpg"
     return None
+
 @app.route('/')
 def home():
-    url = unquote(request.args.get('url'))
     if url is None:
         return jsonify(error=406, text="No url given."), 406
+
+    url = unquote(request.args.get('url'))
+
     if not validators.url(url):
         return jsonify(error=406, text="Invalid url."), 406
 
