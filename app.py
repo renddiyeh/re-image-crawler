@@ -43,10 +43,11 @@ def youtubeImg(url):
 
 @app.route('/')
 def home():
+    url = request.args.get('url')
     if url is None:
         return jsonify(error=406, text="No url given."), 406
 
-    url = unquote(request.args.get('url'))
+    url = unquote(url)
 
     if not validators.url(url):
         return jsonify(error=406, text="Invalid url."), 406
